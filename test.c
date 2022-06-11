@@ -1,29 +1,36 @@
-// Include the test framework.
+#include <stdlib.h>
+
 #include "test-framework/unity.h"
+#include "timeline.h"
 
-// Include the header file with the declarations of the functions you create.
-#include "main.h"
-
-// Runs before every test.
 void setUp(void) {}
-
-// Runs after every test.
 void tearDown(void) {}
 
-// Defines a single test.
-static void test_say_hi(void) {
-  // Check if the 'hello()' function returns "Hello, World!"
-  // This test is expected to fail after first downloading this exercise.
-  // To make this test pass, fix the 'hello()' function definition in the
-  // source file src/hello_world.c.
-  TEST_ASSERT_EQUAL_STRING("Hello, World!", hello());
+static void test_it_works(void) {
+  timeline *state = malloc(sizeof(timeline));
+
+  double begin = 1654761539;
+
+  timeline_add(state, begin, "w1");
+  timeline_add(state, begin + 10, "w1");
+  timeline_add(state, begin + 40, "w1");
+  timeline_add(state, begin + 340, "w1");
+  timeline_add(state, begin + 360, "w2");
+  timeline_add(state, begin + 400, "w2");
+  timeline_finish(state);
+
+  TEST_ASSERT_EQUAL_STRING(
+      "w1,1654761539,1654761579\n"
+      "w1,1654761879,1654761899\n"
+      "w2,1654761899,1654761939\n",
+      state->csv);
+
+  free(state->csv);
+  free(state);
 }
 
-// Runs the test(s)
 int main(void) {
-  UnityBegin("test_hello_world.c");
-
-  RUN_TEST(test_say_hi);
-
+  UnityBegin("test.c");
+  RUN_TEST(test_it_works);
   return UnityEnd();
 }
